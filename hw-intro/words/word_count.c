@@ -46,13 +46,26 @@ ssize_t len_words(WordCount *wchead) {
      encountered in the body of
      this function.
   */
+  // TODO: when will errors happen and how to do with them ?
     size_t len = 0;
+    WordCount* tmp = wchead;
+    while(tmp != NULL)
+    {
+      len++;
+      tmp = tmp->next;
+    }
     return len;
 }
 
 WordCount *find_word(WordCount *wchead, char *word) {
   /* Return count for word, if it exists */
-  WordCount *wc = NULL;
+  WordCount *wc = wchead;
+
+  while(wc != NULL && (strcmp(wc->word,word) != 0))
+  {
+    wc = wc->next;
+  }
+
   return wc;
 }
 
@@ -61,7 +74,33 @@ int add_word(WordCount **wclist, char *word) {
      Otherwise insert with count 1.
      Returns 0 if no errors are encountered in the body of this function; 1 otherwise.
   */
- return 0;
+
+  WordCount* tmp = *wclist;
+  WordCount* pre = NULL;
+
+  while(tmp != NULL && (strcmp(word,tmp->word) != 0))
+  {
+      pre = tmp;
+      tmp = tmp->next;
+  }
+  
+  // suppose doing tail insert
+  // word is new
+  if(tmp == NULL)
+  {
+    tmp = (WordCount*) malloc(sizeof(WordCount));
+    tmp->count = 1;
+    tmp->word = (char*) malloc(strlen(word) + 1);
+    tmp->next = NULL;
+    
+    pre->next = tmp;
+
+    return 0;
+  }
+
+  // word already exist
+  tmp->count++; 
+  return 0;
 }
 
 void fprint_words(WordCount *wchead, FILE *ofile) {
@@ -71,3 +110,7 @@ void fprint_words(WordCount *wchead, FILE *ofile) {
     fprintf(ofile, "%i\t%s\n", wc->count, wc->word);
   }
 }
+
+
+
+
