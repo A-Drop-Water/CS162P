@@ -46,6 +46,34 @@ WordCount *word_counts = NULL;
  */
 int num_words(FILE* infile) {
   int num_words = 0;
+  char tmp;
+  // length of the word is reading
+  int      read_len  =  0;
+
+  while((tmp = fgetc(infile)) != EOF)
+  {
+    // read next word
+    if(tmp == ' ' || tmp == '\n') 
+    {
+      read_len = 0;
+      continue;
+    }
+    
+    num_words++;
+    read_len++;
+    // read utill next whitespace
+    while((tmp = fgetc(infile)) != EOF && tmp != ' ' && tmp != '\n')
+    {
+      read_len++;
+      // reach the max len
+      if(read_len == MAX_WORD_LEN)
+      {
+        break;
+      }
+    }
+
+
+  }
 
   return num_words;
 }
@@ -137,6 +165,14 @@ int main (int argc, char *argv[]) {
     // At least one file specified. Useful functions: fopen(), fclose().
     // The first file can be found at argv[optind]. The last file can be
     // found at argv[argc-1].
+    for(int i = optind;i < argc;++i)
+    {
+      infile = fopen(argv[i] , "r");
+      // Init word count
+      total_words += num_words(infile);
+
+    }
+
   }
 
   if (count_mode) {
