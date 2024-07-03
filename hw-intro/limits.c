@@ -3,8 +3,11 @@
 
 int main() {
     struct rlimit lim;
-    printf("stack size: %ld\n", 0L);
-    printf("process limit: %ld\n", 0L);
-    printf("max file descriptors: %ld\n", 0L);
+    if(!getrlimit(RLIMIT_STACK,&lim))
+      printf("stack size: soft %lu hard  %lu \n", lim.rlim_cur,lim.rlim_max);
+    if(!getrlimit(RLIMIT_DATA,&lim))
+      printf("process limit: soft %lu hard  %lu \n", lim.rlim_cur,lim.rlim_max);
+    if(!getrlimit(RLIMIT_NOFILE,&lim))
+      printf("max file descriptors:  soft %lu hard  %lu \n", lim.rlim_cur,lim.rlim_max);
     return 0;
 }

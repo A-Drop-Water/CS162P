@@ -57,12 +57,14 @@ ssize_t len_words(WordCount *wchead) {
      encountered in the body of
      this function.
   */
-  // TODO: when will errors happen and how to do with them?
+  //  when will errors happen and how to do with them?
+    if(wchead == NULL) return -1;  
+
     size_t len = 0;
-    WordCount* tmp = wchead;
+
     while(tmp != NULL)
     {
-      len++;
+      len++;s
       tmp = tmp->next;
     }
     return len;
@@ -95,6 +97,11 @@ int add_word(WordCount **wclist, char *word) {
      Otherwise insert with count 1.
      Returns 0 if no errors are encountered in the body of this function; 1 otherwise.
   */
+  if(wclist == NULL || word == NULL)
+  {
+    return 1;
+  }
+
   WordCount* tmp = *wclist;
   WordCount* pre = NULL;
   toLower(&word);
