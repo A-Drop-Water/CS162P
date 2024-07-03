@@ -24,6 +24,17 @@ Mutators take a reference to a list as first arg.
 
 /* Basic utilities */
 
+void toLower(char** word)
+{
+  for(int i = 0;(*word)[i];++i)
+  {
+    if(isupper((*word)[i])) 
+    {
+      (*word)[i] = tolower((*word)[i]);
+    }
+  }
+}
+
 char *new_string(char *str) {
   char *new_str = (char *) malloc(strlen(str) + 1);
   if (new_str == NULL) {
@@ -46,7 +57,7 @@ ssize_t len_words(WordCount *wchead) {
      encountered in the body of
      this function.
   */
-  // TODO: when will errors happen and how to do with them ?
+  // TODO: when will errors happen and how to do with them?
     size_t len = 0;
     WordCount* tmp = wchead;
     while(tmp != NULL)
@@ -61,12 +72,22 @@ WordCount *find_word(WordCount *wchead, char *word) {
   /* Return count for word, if it exists */
   WordCount *wc = wchead;
 
-  while(wc != NULL && (strcmp(wc->word,word) != 0))
+  // character should all be lowercase
+  toLower(&word);
+
+  // break when wc reaches end or wc >= word
+  while(wc != NULL && (strcmp(wc->word,word) <  0))
   {
     wc = wc->next;
   }
 
-  return wc;
+  if(wc != NULL && strcmp(wc->word,word) == 0)
+  {
+    return wc;
+  }
+
+  // Not found
+  return NULL;
 }
 
 int add_word(WordCount **wclist, char *word) {
@@ -74,11 +95,22 @@ int add_word(WordCount **wclist, char *word) {
      Otherwise insert with count 1.
      Returns 0 if no errors are encountered in the body of this function; 1 otherwise.
   */
-
   WordCount* tmp = *wclist;
   WordCount* pre = NULL;
+  toLower(&word);
 
-  while(tmp != NULL && (strcmp(word,tmp->word) != 0))
+  // list is empty
+  if(tmp == NULL)
+  {
+    tmp = (WordCount*) malloc(sizeof(WordCount));
+    tmp->count = 1;
+    tmp->word = new_string(word);
+    tmp->next = NULL;
+    *wclist   = tmp;
+    return 0;
+  }
+
+  while(tmp != NULL && (strcmp(word,tmp->word) > 0))
   {
       pre = tmp;
       tmp = tmp->next;
@@ -86,12 +118,20 @@ int add_word(WordCount **wclist, char *word) {
   
   // suppose doing tail insert
   // word is new
-  if(tmp == NULL)
+  if(tmp == NULL || (strcmp(word,tmp->word) < 0))
   {
     tmp = (WordCount*) malloc(sizeof(WordCount));
     tmp->count = 1;
-    tmp->word = (char*) malloc(strlen(word) + 1);
-    tmp->next = NULL;
+    tmp->word = new_string(word);
+    // edge condition when the list is empty
+    if(pre == NULL)
+    { 
+      tmp->next = *wclist;
+      *wclist = tmp;
+      return 0;
+    }
+
+    tmp->next = pre->next;
     
     pre->next = tmp;
 
@@ -110,7 +150,4 @@ void fprint_words(WordCount *wchead, FILE *ofile) {
     fprintf(ofile, "%i\t%s\n", wc->count, wc->word);
   }
 }
-
-
-
-
+  

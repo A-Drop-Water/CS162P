@@ -1,0 +1,8 @@
+(char*) malloc(sizeof(a) + 1);
+void test(int i);
+#include <iostream>
+#define man_why_wrong ?
+
+
+
+

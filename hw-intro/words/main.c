@@ -72,11 +72,37 @@ int num_words(FILE* infile) {
       }
     }
 
-
   }
 
   return num_words;
 }
+
+/* get the next whole word from the infile */
+int getWords(FILE* infile,char** word)
+{
+  // suppose the start pos is right
+  
+  char tmp;
+
+  // consume the whitespace
+  while((tmp = fgetc(infile)) != EOF && (tmp == ' ' || tmp == '\n'));
+
+  if(tmp == EOF) return 1;
+  // read the word
+  int i = 0;
+  (*word)[i++] = tmp;
+  while((tmp = fgetc(infile)) != EOF && tmp != ' ' && tmp != '\n')
+  {
+    if(i == MAX_WORD_LEN) break;
+    (*word)[i++] = tmp;
+  }
+  (*word)[i] = '\0';
+
+
+  return 0;
+
+}
+
 
 /*
  * 3.1.2 Word Frequency Count
@@ -90,6 +116,21 @@ int num_words(FILE* infile) {
  * and 0 otherwise.
  */
 int count_words(WordCount **wclist, FILE *infile) {
+  if(wclist == NULL || infile == NULL)
+  {
+    fprintf(stderr,"wclist or infile doesn't exist!\n");
+    return 1;
+  }
+
+  // how to extract word
+  char* word = (char*) malloc(sizeof(char) * MAX_WORD_LEN + 1);
+  
+  while(!getWords(infile,&word))
+  {
+    add_word(wclist,word);
+  }
+  
+
   return 0;
 }
 
@@ -98,6 +139,8 @@ int count_words(WordCount **wclist, FILE *infile) {
  * Useful function: strcmp().
  */
 static bool wordcount_less(const WordCount *wc1, const WordCount *wc2) {
+  if(wc1->count < wc2->count ) return 1;
+  if((wc1->count == wc2->count) && (strcmp(wc1->word,wc2->word) < 0)) return 1;
   return 0;
 }
 
@@ -162,6 +205,7 @@ int main (int argc, char *argv[]) {
     // No input file specified, instead, read from STDIN instead.
     infile = stdin;
     total_words += num_words(infile);
+    count_words(&word_counts,infile);
   } else {
     // At least one file specified. Useful functions: fopen(), fclose().
     // The first file can be found at argv[optind]. The last file can be
@@ -171,6 +215,8 @@ int main (int argc, char *argv[]) {
       infile = fopen(argv[i] , "r");
       // Init word count
       total_words += num_words(infile);
+      infile = fopen(argv[i] , "r");
+      count_words(&word_counts,infile);
 
     }
 
